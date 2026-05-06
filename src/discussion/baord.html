@@ -22,30 +22,51 @@
 <body>
 
     <!-- TODO: Create a 'header' with a main heading ('h1') "General Discussion Board". -->
+    <header>
+           <h1>General Discussion Board</h1>
+    </header>
 
     <!-- TODO: Create the 'main' content area. -->
+     <main>
 
         <!-- Section 1: Create a New Topic -->
         <!-- TODO: Create a 'section' for the "new topic" form. -->
+         <section>
             <!-- TODO: Add a sub-heading ('h2') "Start a New Topic". -->
+             <h2>Start a New Topic</h2>
 
             <!-- TODO: Create a 'form' with an id "new-topic-form". Action can be '#'. -->
+             <form id="new-topic-form">
                 <!-- TODO: Use a 'fieldset' to group the form controls. -->
+                 <fieldset>
                     <!-- TODO: Add a 'legend', e.g., "New Topic Details". -->
+                     <legend>New Topic Details</legend>
 
                     <!-- TODO: Add a 'label' and 'input' for the topic subject.
                          - label 'for': "topic-subject"
                          - input 'id': "topic-subject", type="text", required -->
 
+                         <label for="topic-subject">Topic Subject:</label>
+                         <input id="topic-subject" type="text" required>
+
                     <!-- TODO: Add a 'label' and 'textarea' for the main message.
                          - label 'for': "topic-message"
                          - textarea 'id': "topic-message", rows="6", required -->
 
+                         <label for="topic-message">Topic Message: </label>
+                         <textarea id="topic-message" rows="6" required></textarea>
+
                     <!-- TODO: Add a 'button' to submit the form.
                          - id="create-topic", type="submit", Text: "Create Topic" -->
+
+                         <button id="create-topic" type="submit">Create Topic</button>
+
                 <!-- End of fieldset. -->
+                 </fieldset>
             <!-- End of form. -->
+             </form>
         <!-- End of form section. -->
+         </section>
 
 
         <!-- Section 2: Existing Topics -->
@@ -77,5 +98,6 @@
         <!-- End of list section. -->
 
     <!-- End of main. -->
+     </main>
 </body>
 </html>
