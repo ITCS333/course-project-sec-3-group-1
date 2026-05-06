@@ -70,12 +70,15 @@
              Section 2: Replies
              ============================================================ -->
         <!-- TODO: Create a <section id="replies-section">. -->
+          <section id="replies-section">
 
             <!-- TODO: Add a sub-heading <h2> "Replies". -->
+               <h2>Replies</h2>
 
             <!-- TODO: Create a <div id="reply-list-container"> to hold the
                  list of reply articles.
                  The id is required by topic.js. -->
+                 <div id="reply-list-container">
 
                 <!-- topic.js will inject one <article> per reply here.
                      Each article follows the structure below. -->
@@ -95,15 +98,19 @@
                 (primary key). -->
 
             <!-- End of #reply-list-container -->
+             </div>
 
             <!-- ============================================================
                  Section 3: Add a Reply Form
                  ============================================================ -->
             <!-- TODO: Create a <form id="reply-form"> (action="#").
                  The id is required by topic.js. -->
+                 <form id="reply-form" action="#">
 
                 <!-- TODO: Use a <fieldset> to group the controls. -->
+                    <fieldset>
                     <!-- TODO: Add a <legend>, e.g., "Your Reply". -->
+                         <legend>Your Reply</legend>
 
                     <!-- TODO: Add a <label> and <textarea> for the reply.
                          - label for="new-reply"
@@ -111,13 +118,21 @@
                          - The id must be exactly "new-reply" as topic.js
                            reads this element by that id. -->
 
+                           <label for="new-reply">New Reply:</label>
+                           <textarea id="new-reply" required></textarea>
+
                     <!-- TODO: Add a submit <button>.
                          - type="submit"
                          - Text: "Post Reply" -->
+
+                         <button type="submit">Post Reply</button>
                 <!-- End of <fieldset> -->
+                    </fieldset>
             <!-- End of <form> -->
+               </form>
 
         <!-- End of <section#replies-section> -->
+          </section>
 
     <!-- End of <main> -->
      </main>
