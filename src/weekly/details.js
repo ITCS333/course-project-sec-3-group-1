@@ -1,168 +1,192 @@
 /*
-  Requirement: Populate the weekly detail page and handle the discussion forum.
+  Requirement: Populate the weekly detail page and discussion forum.
 
   Instructions:
-  1. This file is already linked to `details.html` via:
-         <script src="details.js" defer></script>
+  1. Link this file to `details.html` using:
+     <script src="details.js" defer></script>
 
-  2. The following ids must exist in details.html (already listed in the
-     HTML comments):
-       #week-title          — <h1>
-       #week-start-date     — <p>
-       #week-description    — <p>
-       #week-links-list     — <ul>
-       #comment-list        — <div>
-       #comment-form        — <form>
-       #new-comment         — <textarea>
+  2. In `details.html`, add the following IDs:
+     - To the <h1>: `id="week-title"`
+     - To the start date <p>: `id="week-start-date"`
+     - To the description <p>: `id="week-description"`
+     - To the "Exercises & Resources" <ul>: `id="week-links-list"`
+     - To the <div> for comments: `id="comment-list"`
+     - To the "Ask a Question" <form>: `id="comment-form"`
+     - To the <textarea>: `id="new-comment-text"`
 
   3. Implement the TODOs below.
-
-  API base URL: ./api/index.php
-  Week object shape returned by the API:
-    {
-      id:          number,   // integer primary key from the weeks table
-      title:       string,
-      start_date:  string,   // "YYYY-MM-DD"
-      description: string,
-      links:       string[]  // decoded array of URL strings
-    }
-
-  Comment object shape returned by the API
-  (from the comments_week table):
-    {
-      id:          number,
-      week_id:     number,
-      author:      string,
-      text:        string,
-      created_at:  string
-    }
 */
 
 // --- Global Data Store ---
-let currentWeekId  = null;  // integer id from the weeks table
+// These will hold the data related to *this* specific week.
+let currentWeekId = null;
 let currentComments = [];
 
 // --- Element Selections ---
-// TODO: Select each element by its id:
-//   weekTitle, weekStartDate, weekDescription,
-//   weekLinksList, commentList, commentForm, newCommentInput.
+// TODO: Select all the elements you added IDs for in step 2.
+const weekTitle = document.getElementById('week-title');
+const weekStartDate = document.getElementById('week-start-date');
+const weekDescription = document.getElementById('week-description');
+const weekLinksList = document.getElementById('week-links-list');
+const commentList = document.getElementById('comment-list');
+const commentForm = document.getElementById('comment-form');
+const newCommentText = document.getElementById('new-comment-text');
 
 // --- Functions ---
 
 /**
- * TODO: Implement getWeekIdFromURL.
- *
+ * TODO: Implement the getWeekIdFromURL function.
  * It should:
- * 1. Read window.location.search.
- * 2. Construct a URLSearchParams object from it.
- * 3. Return the value of the 'id' parameter (a string that represents
- *    the integer primary key of the week).
+ * 1. Get the query string from `window.location.search`.
+ * 2. Use the `URLSearchParams` object to get the value of the 'id' parameter.
+ * 3. Return the id.
  */
 function getWeekIdFromURL() {
-  // ... your implementation here ...
+  const params = new URLSearchParams(window.location.search);
+  return params.get('id');
 }
 
 /**
- * TODO: Implement renderWeekDetails.
- *
- * Parameters:
- *   week — the week object returned by the API (see shape above).
- *
+ * TODO: Implement the renderWeekDetails function.
+ * It takes one week object.
  * It should:
- * 1. Set weekTitle.textContent    = week.title.
- * 2. Set weekStartDate.textContent = "Starts on: " + week.start_date.
- *    (Note: use week.start_date, which matches the SQL column name.)
- * 3. Set weekDescription.textContent = week.description.
- * 4. Clear weekLinksList, then for each URL in week.links:
- *    - Create a <li> containing an <a href="{url}">{url}</a>.
- *    - Append the <li> to weekLinksList.
- *    (week.links is already a decoded string array from the API.)
+ * 1. Set the `textContent` of `weekTitle` to the week's title.
+ * 2. Set the `textContent` of `weekStartDate` to "Starts on: " + week's startDate.
+ * 3. Set the `textContent` of `weekDescription`.
+ * 4. Clear `weekLinksList` and then create and append `<li><a href="...">...</a></li>`
+ * for each link in the week's 'links' array. The link's `href` and `textContent`
+ * should both be the link URL.
  */
 function renderWeekDetails(week) {
-  // ... your implementation here ...
+  weekTitle.textContent = week.title;
+  weekStartDate.textContent = "Starts on: " + week.startDate;
+  weekDescription.textContent = week.description;
+  
+  weekLinksList.innerHTML = '';
+  week.links.forEach(linkUrl => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = linkUrl;
+    a.textContent = linkUrl;
+    li.appendChild(a);
+    weekLinksList.appendChild(li);
+  });
 }
 
 /**
- * TODO: Implement createCommentArticle.
- *
- * Parameters:
- *   comment — one comment object from the API:
- *     { id, week_id, author, text, created_at }
- *
- * Returns an <article> element:
- *   <article>
- *     <p>{comment.text}</p>
- *     <footer>Posted by: {comment.author}</footer>
- *   </article>
+ * TODO: Implement the createCommentArticle function.
+ * It takes one comment object {author, text}.
+ * It should return an <article> element matching the structure in `details.html`.
+ * (e.g., an <article> containing a <p> and a <footer>).
  */
 function createCommentArticle(comment) {
-  // ... your implementation here ...
+  const article = document.createElement('article');
+  article.className = 'comment';
+  
+  const p = document.createElement('p');
+  p.textContent = comment.text;
+  
+  const footer = document.createElement('footer');
+  footer.textContent = "Posted by: " + comment.author;
+  
+  article.appendChild(p);
+  article.appendChild(footer);
+  return article;
 }
 
 /**
- * TODO: Implement renderComments.
- *
+ * TODO: Implement the renderComments function.
  * It should:
- * 1. Clear commentList (set innerHTML to "").
- * 2. Loop through currentComments.
- * 3. For each comment, call createCommentArticle(comment) and
- *    append the result to commentList.
+ * 1. Clear the `commentList`.
+ * 2. Loop through the global `currentComments` array.
+ * 3. For each comment, call `createCommentArticle()`, and
+ * append the resulting <article> to `commentList`.
  */
 function renderComments() {
-  // ... your implementation here ...
+  commentList.innerHTML = '';
+  currentComments.forEach(comment => {
+    const commentElement = createCommentArticle(comment);
+    commentList.appendChild(commentElement);
+  });
 }
 
 /**
- * TODO: Implement handleAddComment (async).
- *
- * This is the event handler for commentForm's 'submit' event.
+ * TODO: Implement the handleAddComment function.
+ * This is the event handler for the `commentForm` 'submit' event.
  * It should:
- * 1. Call event.preventDefault().
- * 2. Read and trim the value from newCommentInput (#new-comment).
- * 3. If the value is empty, return early (do nothing).
- * 4. Send a POST to './api/index.php?action=comment' with the body:
- *      {
- *        week_id: currentWeekId,   // integer
- *        author:  "Student",       // hardcoded for this exercise
- *        text:    commentText
- *      }
- *    The API inserts a row into the comments_week table.
- * 5. On success (result.success === true):
- *    - Push the new comment object (from result.data) onto
- *      currentComments.
- *    - Call renderComments() to refresh the list.
- *    - Clear newCommentInput.
+ * 1. Prevent the form's default submission.
+ * 2. Get the text from `newCommentText.value`.
+ * 3. If the text is empty, return.
+ * 4. Create a new comment object: { author: 'Student', text: commentText }
+ * (For this exercise, 'Student' is a fine hardcoded author).
+ * 5. Add the new comment to the global `currentComments` array (in-memory only).
+ * 6. Call `renderComments()` to refresh the list.
+ * 7. Clear the `newCommentText` textarea.
  */
-async function handleAddComment(event) {
-  // ... your implementation here ...
+function handleAddComment(event) {
+  event.preventDefault();
+  const commentText = newCommentText.value.trim();
+  
+  if (!commentText) return;
+
+  const newComment = {
+    author: 'Student',
+    text: commentText
+  };
+
+  currentComments.push(newComment);
+  renderComments();
+  newCommentText.value = '';
 }
 
 /**
- * TODO: Implement initializePage (async).
- *
+ * TODO: Implement an `initializePage` function.
+ * This function needs to be 'async'.
  * It should:
- * 1. Call getWeekIdFromURL() and store the result in currentWeekId.
- * 2. If currentWeekId is null or empty, set
- *    weekTitle.textContent = "Week not found." and return.
- * 3. Fetch both the week details and its comments in parallel using
- *    Promise.all:
- *      - Week:     GET ./api/index.php?id={currentWeekId}
- *                  Response: { success: true, data: { ...week object } }
- *      - Comments: GET ./api/index.php?action=comments&week_id={currentWeekId}
- *                  Response: { success: true, data: [ ...comment objects ] }
- *    Comments are stored in the comments_week table
- *    (columns: id, week_id, author, text, created_at).
- * 4. Store the comments array in currentComments
- *    (use an empty array if none exist).
- * 5. If the week was found:
- *    - Call renderWeekDetails(week).
- *    - Call renderComments().
- *    - Attach the 'submit' listener to commentForm (calls handleAddComment).
- * 6. If the week was not found:
- *    - Set weekTitle.textContent = "Week not found."
+ * 1. Get the `currentWeekId` by calling `getWeekIdFromURL()`.
+ * 2. If no ID is found, set `weekTitle.textContent = "Week not found."` and stop.
+ * 3. `fetch` both 'weeks.json' and 'week-comments.json' (you can use `Promise.all`).
+ * 4. Parse both JSON responses.
+ * 5. Find the correct week from the weeks array using the `currentWeekId`.
+ * 6. Get the correct comments array from the comments object using the `currentWeekId`.
+ * Store this in the global `currentComments` variable. (If no comments exist, use an empty array).
+ * 7. If the week is found:
+ * - Call `renderWeekDetails()` with the week object.
+ * - Call `renderComments()` to show the initial comments.
+ * - Add the 'submit' event listener to `commentForm` (calls `handleAddComment`).
+ * 8. If the week is not found, display an error in `weekTitle`.
  */
 async function initializePage() {
-  // ... your implementation here ...
+  currentWeekId = getWeekIdFromURL();
+  
+  if (!currentWeekId) {
+    weekTitle.textContent = "Week not found.";
+    return;
+  }
+
+  try {
+    const [weeksResponse, commentsResponse] = await Promise.all([
+      fetch('weeks.json'),
+      fetch('week-comments.json')
+    ]);
+
+    const weeksData = await weeksResponse.json();
+    const commentsData = await commentsResponse.json();
+
+    const targetWeek = weeksData.find(w => w.id === currentWeekId);
+    currentComments = commentsData[currentWeekId] || [];
+
+    if (targetWeek) {
+      renderWeekDetails(targetWeek);
+      renderComments();
+      commentForm.addEventListener('submit', handleAddComment);
+    } else {
+      weekTitle.textContent = "Week not found.";
+    }
+  } catch (error) {
+    console.error("Error loading page data:", error);
+    weekTitle.textContent = "Error loading data.";
+  }
 }
 
 // --- Initial Page Load ---
