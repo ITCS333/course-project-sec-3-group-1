@@ -75,8 +75,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+
+
 require_once __DIR__ . '/../../common/db.php';
 $db = getDBConnection();
+
+if (!$db) {
+    echo json_encode(['success' => false, 'message' => 'Database connection failed']);
+    exit;}
 
 $method = $_SERVER['REQUEST_METHOD'];
 
