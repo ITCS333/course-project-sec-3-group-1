@@ -158,17 +158,18 @@ function handleAddComment(event) {
  */
 async function initializePage() {
   try {
-    const response = await fetch('weeks.json');
-    const data = await response.json();
-    const weeksData = data.weeks; 
+    const response = await fetch('api/index.php');
+    const result = await response.json();
+    const weeksData = result.data; 
+
     const weekId = new URLSearchParams(window.location.search).get('id');
-    const selectedWeek = weeksData.find(w => w.id === weekId);
-  
+    const selectedWeek = weeksData.find(w => w.id == weekId);
+    
     if (selectedWeek) {
       renderDetails(selectedWeek);
     }
   } catch (err) {
-    console.error("Error loading page data:", err);
+    console.error("Error:", err);
   }
 }
 
