@@ -28,7 +28,16 @@ const article = document.createElement("article");
   article.innerHTML = `
     <h3>${resource.title}</h3>
     <p>${resource.description}</p>
-    <a href="details.html?id=${resource.id}">View Resource & Discussion</a>
+
+    <a href="${resource.link}" target="_blank">
+      Open Resource
+    </a>
+
+    <br><br>
+
+    <a href="details.html?id=${resource.id}">
+      View Resource & Discussion
+    </a>
   `;
 
   return article;
@@ -47,22 +56,39 @@ const article = document.createElement("article");
  *    - Append the returned <article> element to the list section.
  */
 async function loadResources() {
-const response = await fetch(
-    "./api/index.php"
-  );
+try {
 
-  const result = await response.json();
+    const response = await fetch("./api/index.php");
 
-  resourceListSection.innerHTML = "";
+    const result = await response.json();
 
-  result.data.forEach((resource) => {
+    resourceListSection.innerHTML = "";
 
-    const article =
-      createResourceArticle(resource);
+    if (!result.success) {
 
-    resourceListSection.appendChild(article);
+      resourceListSection.innerHTML =
+        "<p>Failed to load resources.</p>";
 
-  });}
+      return;
+    }
+
+    result.data.forEach((resource) => {
+
+      const article =
+        createResourceArticle(resource);
+
+      resourceListSection.appendChild(article);
+
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    resourceListSection.innerHTML =
+      "<p>Error loading resources.</p>";
+  }
+}
 
 // --- Initial Page Load ---
 // Call the function to populate the page.

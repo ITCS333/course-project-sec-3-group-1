@@ -79,10 +79,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 
+require_once './config/Database.php';
 
 
-require_once __DIR__ . '/../../common/db.php';
-$db = getDBConnection();
+
+$database = new Database();
+
+$db = $database->getConnection();
 
 
 $method = $_SERVER['REQUEST_METHOD'];
