@@ -82,33 +82,55 @@ function getWeekById($db, $id) {
     sendResponse(['success' => true, 'data' => $week]);
 }
 
+// REPLACE your old createWeek with this:
 function createWeek($db, $data) {
     $title = trim($data['title'] ?? '');
     $start_date = trim($data['start_date'] ?? '');
-    
+
     if (empty($title) || empty($start_date)) {
         sendResponse(['success' => false], 400);
     }
-    
+
+    if (!validateDate($start_date)) {
+        sendResponse(['success' => false, 'message' => 'Invalid date format'], 400);
+    }
+
     $links = json_encode($data['links'] ?? []);
     $stmt = $db->prepare("INSERT INTO weeks (title, start_date, description, links) VALUES (?, ?, ?, ?)");
     $stmt->execute([$title, $start_date, $data['description'] ?? '', $links]);
     sendResponse(['success' => true, 'id' => $db->lastInsertId()], 201);
 }
 
-function updateWeek($db, $data) {
-    $id = $data['id'] ?? null;
-    if (!$id) sendResponse(['success' => false], 400);
 
-  
+function updateWeek($db, $data) {
+    $id = $data['id'] ?? $_GET['id'] ?? null;
+    
+    if (!$id) {
+        sendResponse(['success' => false], 400);
+    }
+
+    if (isset($data['start_date']) && !validateDate($data['start_date'])) {
+        sendResponse(['success' => false], 400);
+    }
+
     $check = $db->prepare("SELECT id FROM weeks WHERE id = ?");
     $check->execute([$id]);
-    if (!$check->fetch()) sendResponse(['success' => false], 404);
+    if (!$check->fetch()) {
+        sendResponse(['success' => false], 404);
+    }
 
+    $stmt = $db->prepare("UPDATE weeks SET title = ?, start_date = ?, description = ?, links = ? WHERE id = ?");
     $links = json_encode($data['links'] ?? []);
-    $stmt = $db->prepare("UPDATE weeks SET title=?, start_date=?, description=?, links=? WHERE id=?");
-    $stmt->execute([$data['title'], $data['start_date'], $data['description'], $links, $id]);
-    sendResponse(['success' => true]);
+    
+    $success = $stmt->execute([
+        $data['title'] ?? '',
+        $data['start_date'] ?? '',
+        $data['description'] ?? '',
+        $links,
+        $id
+    ]);
+
+    sendResponse(['success' => $success]);
 }
 
 function deleteWeek($db, $id) {
@@ -146,6 +168,10 @@ function deleteComment($db, $id) {
     $stmt->execute([$id]);
     if ($stmt->rowCount() === 0) sendResponse(['success' => false], 404);
     sendResponse(['success' => true]);
+}
+function validateDate($date, $format = 'Y-m-d') {
+    $d = DateTime::createFromFormat($format, $date);
+    return $d && $d->format($format) === $date;
 }
 
 function sendResponse($data, $code = 200) {
