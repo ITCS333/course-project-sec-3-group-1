@@ -3,28 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Week Details</title>
-
+    <script src="details.js" defer></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>Week 1: Introduction to HTML</h1>
+        <h1 id="week-title">Week 1: Introduction to HTML</h1>
     </header>
 
     <main>
-
         <article>
-            <p>Starts on: 2026-05-11</p>
+            <p id="week-start-date">Starts on: 2026-05-11</p>
 
             <h2>Description & Notes</h2>
-
-            <p>This week focuses on the fundamental structure of the web. We will explore semantic elements, the importance of the document head, and how to create accessible content for all users.</p>
+            <p id="week-description">This week focuses on the fundamental structure of the web. We will explore semantic elements, the importance of the document head, and how to create accessible content for all users.</p>
 
             <h2>Exercises & Resources</h2>
-
-            <ul>
+            <ul id="week-links-list">
                 <li><a href="#">Exercise 1 - Basic Tags</a></li>
                 <li><a href="#">HTML5 Semantic Elements Cheatsheet</a></li>
                 <li><a href="#">Validator Service</a></li>
@@ -34,19 +30,10 @@
         <section id="discussion-forum">
             <h2>Discussion</h2>
 
-            <div class="comments-list">
-                <article>
-                    <p>I have a question about the 'header' tag. Should it be used only once per page?</p>
-                    <footer>Posted by: John Doe</footer>
-                </article>
+            <div id="comment-list">
+                </div>
 
-                <article>
-                    <p>The resources for this week are very helpful, especially the validator link!</p>
-                    <footer>Posted by: Jane Smith</footer>
-                </article>
-            </div>
-
-            <form action="#">
+            <form id="comment-form" action="#">
                 <fieldset>
                     <legend>Ask a Question</legend>
 
@@ -57,7 +44,6 @@
                 </fieldset>
             </form>
         </section>
-
     </main>
 </body>
 </html>
