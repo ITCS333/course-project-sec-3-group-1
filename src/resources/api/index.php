@@ -301,7 +301,7 @@ function createResource($db, $data) {
             'message' => 'Failed to create resource.'
         ], 500);
 }
-
+}
 
 
 /**
@@ -596,7 +596,7 @@ function createComment($db, $data) {
             'message' => 'Failed to create comment.'
         ], 500);
     
-}
+}}
 
 
 /**
@@ -657,7 +657,7 @@ function deleteComment($db, $commentId) {
             'message' => 'Failed to delete comment.'
         ], 500);
     
-}
+}}
 
 
 // ============================================================================

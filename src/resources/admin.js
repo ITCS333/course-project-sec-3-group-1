@@ -35,59 +35,45 @@ const resourcesTbody = document.querySelector("#resources-tbody");
  *    - A "Delete" button with class="delete-btn" and data-id="${id}".
  */
 function createResourceRow(resource) {
- const tr = document.createElement("tr");
 
-  tr.innerHTML = `
+  const row = document.createElement("tr");
+
+  row.innerHTML = `
     <td>${resource.title}</td>
-
     <td>${resource.description}</td>
-
+    <td>${resource.link}</td>
     <td>
-      <a href="${resource.link}" target="_blank">
-        Visit
-      </a>
-    </td>
-
-    <td>
-
-      <button 
-        class="edit-btn" 
-        data-id="${resource.id}"
-      >
+      <button class="edit-btn" data-id="${resource.id}">
         Edit
       </button>
 
-      <button 
-        class="delete-btn" 
-        data-id="${resource.id}"
-      >
+      <button class="delete-btn" data-id="${resource.id}">
         Delete
       </button>
-
     </td>
   `;
 
-  return tr;}
+  return row;
+}
 
-/**
- * TODO: Implement the renderTable function.
- * It should:
- * 1. Clear the resources table body ('#resources-tbody').
- * 2. Loop through the global `resources` array.
- * 3. For each resource, call `createResourceRow()` and
- *    append the returned <tr> to the table body.
- */
-function renderTable() {
- resourcesTbody.innerHTML = "";
+
+function renderTable(resources) {
+
+  const tbody =
+    document.querySelector("#resources-tbody");
+
+  tbody.innerHTML = "";
 
   resources.forEach((resource) => {
 
-    const row = createResourceRow(resource);
+    const row =
+      createResourceRow(resource);
 
-    resourcesTbody.appendChild(row);
+    tbody.appendChild(row);
 
   });
 }
+
 
 /**
  * TODO: Implement the handleAddResource function.
