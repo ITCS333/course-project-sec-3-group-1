@@ -83,9 +83,8 @@ require_once './config/Database.php';
 
 
 
-$database = new Database();
-
-$db = $database->getConnection();
+require_once __DIR__ . '/../../common/db.php';
+$db = getDBConnection();
 
 
 $method = $_SERVER['REQUEST_METHOD'];
