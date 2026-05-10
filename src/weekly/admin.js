@@ -127,15 +127,15 @@ function handleTableClick(event) {
 async function loadAndInitialize() {
   try {
     const response = await fetch('weeks.json');
-    weeks = await response.json();
+    const data = await response.json(); // Get the whole JSON object
+    weeks = data.weeks;                 // Extract the array into your global 'weeks' variable
   } catch (err) {
     console.log("No initial data found or fetch failed.");
   }
-  renderTable();
+  renderTable(); // Now this won't crash because 'weeks' is an array
   weekForm.addEventListener('submit', handleAddWeek);
   weeksTableBody.addEventListener('click', handleTableClick);
 }
-
 // --- Initial Page Load ---
 // Call the main async function to start the application.
 loadAndInitialize();
