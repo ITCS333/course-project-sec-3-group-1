@@ -157,35 +157,18 @@ function handleAddComment(event) {
  * 8. If the week is not found, display an error in `weekTitle`.
  */
 async function initializePage() {
-  currentWeekId = getWeekIdFromURL();
-  
-  if (!currentWeekId) {
-    weekTitle.textContent = "Week not found.";
-    return;
-  }
-
   try {
-    const [weeksResponse, commentsResponse] = await Promise.all([
-      fetch('weeks.json'),
-      fetch('week-comments.json')
-    ]);
-
-    const weeksData = await weeksResponse.json();
-    const commentsData = await commentsResponse.json();
-
-    const targetWeek = weeksData.find(w => w.id === currentWeekId);
-    currentComments = commentsData[currentWeekId] || [];
-
-    if (targetWeek) {
-      renderWeekDetails(targetWeek);
-      renderComments();
-      commentForm.addEventListener('submit', handleAddComment);
-    } else {
-      weekTitle.textContent = "Week not found.";
+    const response = await fetch('weeks.json');
+    const data = await response.json();
+    const weeksData = data.weeks; 
+    const weekId = new URLSearchParams(window.location.search).get('id');
+    const selectedWeek = weeksData.find(w => w.id === weekId);
+  
+    if (selectedWeek) {
+      renderDetails(selectedWeek);
     }
-  } catch (error) {
-    console.error("Error loading page data:", error);
-    weekTitle.textContent = "Error loading data.";
+  } catch (err) {
+    console.error("Error loading page data:", err);
   }
 }
 
