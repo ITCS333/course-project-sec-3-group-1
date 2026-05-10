@@ -126,11 +126,13 @@ function handleTableClick(event) {
  */
 async function loadAndInitialize() {
   try {
-    const response = await fetch('weeks.json');
-    const data = await response.json(); 
-    weeks = data.weeks;               
+   
+    const response = await fetch('api/index.php'); 
+    const result = await response.json();
+    weeks = result.data; 
   } catch (err) {
-    console.log("No initial data found or fetch failed.");
+    console.log("Fetch failed:", err);
+    weeks = []; 
   }
   renderTable(); 
   weekForm.addEventListener('submit', handleAddWeek);
