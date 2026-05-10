@@ -13,6 +13,7 @@
 
 // --- Element Selections ---
 const resourceListSection = document.querySelector("#resource-list-section");
+
 // --- Functions ---
 
 /**
@@ -23,17 +24,13 @@ const resourceListSection = document.querySelector("#resource-list-section");
  * `details.html?id=${id}` so the detail page knows which resource to load.
  */
 function createResourceArticle(resource) {
-const article = document.createElement("article");
+
+  const article = document.createElement("article");
 
   article.innerHTML = `
     <h3>${resource.title}</h3>
+
     <p>${resource.description}</p>
-
-    <a href="${resource.link}" target="_blank">
-      Open Resource
-    </a>
-
-    <br><br>
 
     <a href="details.html?id=${resource.id}">
       View Resource & Discussion
@@ -56,7 +53,8 @@ const article = document.createElement("article");
  *    - Append the returned <article> element to the list section.
  */
 async function loadResources() {
-try {
+
+  try {
 
     const response = await fetch("./api/index.php");
 
@@ -64,21 +62,11 @@ try {
 
     resourceListSection.innerHTML = "";
 
-    if (!result.success) {
-
-      resourceListSection.innerHTML =
-        "<p>Failed to load resources.</p>";
-
-      return;
-    }
-
     result.data.forEach((resource) => {
 
-      const article =
-        createResourceArticle(resource);
+      const article = createResourceArticle(resource);
 
       resourceListSection.appendChild(article);
-
     });
 
   } catch (error) {
