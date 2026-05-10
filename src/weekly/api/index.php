@@ -102,6 +102,100 @@ function createWeek(PDO $db, array $data): void {
         sendResponse(['success' => false, 'message' => 'Server Error'], 500);
     }
 }
+function updateWeek(PDO $db, array $data): void {
+    $id = $data['id'] ?? null;
+    if (!$id || !is_numeric($id)) {
+        sendResponse(['success' => false, 'message' => 'Invalid ID'], 400);
+    }
+
+    // Check if the week actually exists
+    $stmt = $db->prepare("SELECT id FROM weeks WHERE id = ?");
+    $stmt->execute([$id]);
+    if (!$stmt->fetch()) {
+        sendResponse(['success' => false, 'message' => 'Week not found'], 404);
+    }
+
+    // Validate date format if it's being updated
+    if (isset($data['start_date']) && !validateDate($data['start_date'])) {
+        sendResponse(['success' => false, 'message' => 'Invalid date'], 400);
+    }
+
+    $title = sanitizeInput($data['title'] ?? '');
+    $desc = sanitizeInput($data['description'] ?? '');
+    $links = json_encode($data['links'] ?? []);
+
+    $stmt = $db->prepare("UPDATE weeks SET title = ?, start_date = ?, description = ?, links = ? WHERE id = ?");
+    if ($stmt->execute([$title, $data['start_date'], $desc, $links, $id])) {
+        sendResponse(['success' => true]);
+    } else {
+        sendResponse(['success' => false], 500);
+    }
+}
+
+function deleteWeek(PDO $db, $id): void {
+    if (!$id || !is_numeric($id)) {
+        sendResponse(['success' => false], 400);
+    }
+
+    $stmt = $db->prepare("DELETE FROM weeks WHERE id = ?");
+    $stmt->execute([$id]);
+
+    if ($stmt->rowCount() > 0) {
+        sendResponse(['success' => true]);
+    } else {
+        sendResponse(['success' => false, 'message' => 'Not found'], 404);
+    }
+}
+function getCommentsByWeek(PDO $db, $weekId): void {
+    if (!$weekId || !is_numeric($weekId)) {
+        sendResponse(['success' => false], 400);
+    }
+
+    $stmt = $db->prepare("SELECT id, week_id, author, text, created_at FROM comments_week WHERE week_id = ? ORDER BY created_at ASC");
+    $stmt->execute([$weekId]);
+    $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    sendResponse(['success' => true, 'data' => $comments]);
+}
+
+function createComment(PDO $db, array $data): void {
+    $weekId = $data['week_id'] ?? null;
+    $author = sanitizeInput($data['author'] ?? 'Anonymous');
+    $text = sanitizeInput($data['text'] ?? '');
+
+    if (!$weekId || empty($text)) {
+        sendResponse(['success' => false, 'message' => 'Text is required'], 400);
+    }
+
+    // Verify the week exists before commenting
+    $check = $db->prepare("SELECT id FROM weeks WHERE id = ?");
+    $check->execute([$weekId]);
+    if (!$check->fetch()) {
+        sendResponse(['success' => false, 'message' => 'Week not found'], 404);
+    }
+
+    $stmt = $db->prepare("INSERT INTO comments_week (week_id, author, text) VALUES (?, ?, ?)");
+    if ($stmt->execute([$weekId, $author, $text])) {
+        sendResponse(['success' => true, 'id' => $db->lastInsertId()], 201);
+    } else {
+        sendResponse(['success' => false], 500);
+    }
+}
+
+function deleteComment(PDO $db, $commentId): void {
+    if (!$commentId || !is_numeric($commentId)) {
+        sendResponse(['success' => false], 400);
+    }
+
+    $stmt = $db->prepare("DELETE FROM comments_week WHERE id = ?");
+    $stmt->execute([$commentId]);
+
+    if ($stmt->rowCount() > 0) {
+        sendResponse(['success' => true]);
+    } else {
+        sendResponse(['success' => false], 404);
+    }
+}
 
 // ============================================================================
 // ROUTER
