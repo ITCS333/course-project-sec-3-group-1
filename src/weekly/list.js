@@ -50,11 +50,19 @@ function createWeekArticle(week) {
  */
 async function loadWeeks() {
   try {
-    const response = await fetch('weeks.json');
-    const data = await response.json();
-    const weeksArray = data.weeks;
-    weeksArray.forEach(week => {
-    });
+  
+    const response = await fetch('api/index.php');
+    const result = await response.json();
+    const weeksArray = result.data;
+    if (weeksArray && Array.isArray(weeksArray)) {
+        const container = document.querySelector('#week-list-section');
+        container.innerHTML = ''; 
+
+        weeksArray.forEach(week => {
+            const article = createWeekArticle(week);
+            container.appendChild(article);
+        });
+    }
   } catch (err) {
     console.error("Error loading weeks:", err);
   }
