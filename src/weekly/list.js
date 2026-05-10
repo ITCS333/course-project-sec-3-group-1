@@ -51,16 +51,12 @@ function createWeekArticle(week) {
 async function loadWeeks() {
   try {
     const response = await fetch('weeks.json');
-    const weeks = await response.json();
-
-    listSection.innerHTML = '';
-
-    weeks.forEach(week => {
-      const weekArticle = createWeekArticle(week);
-      listSection.appendChild(weekArticle);
+    const data = await response.json();
+    const weeksArray = data.weeks;
+    weeksArray.forEach(week => {
     });
-  } catch (error) {
-    console.error("Error loading weeks:", error);
+  } catch (err) {
+    console.error("Error loading weeks:", err);
   }
 }
 
