@@ -1,5 +1,4 @@
 <?php
-// 1. Headers 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
@@ -10,7 +9,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// 2. Database Connection
 require_once __DIR__ . '/../../common/db.php';
 $db = getDBConnection();
 
@@ -18,48 +16,46 @@ $method = $_SERVER['REQUEST_METHOD'];
 $rawData = file_get_contents('php://input');
 $data = json_decode($rawData, true) ?? [];
 
-$action = $_GET['action'] ?? null;
-$id = $_GET['id'] ?? null;
-$resourceId = $_GET['resource_id'] ?? null;
+$action    = $_GET['action']     ?? null;
+$id        = $_GET['id']         ?? null;
+$weekId    = $_GET['week_id']    ?? null;
 $commentId = $_GET['comment_id'] ?? null;
 
-// --- ROUTER ---
 try {
     if ($method === 'GET') {
         if ($action === 'comments') {
-            getComments($db, $resourceId);
+            getCommentsByWeek($db, $weekId);
         } elseif ($id) {
-            getResourceById($db, $id);
+            getWeekById($db, $id);
         } else {
-            getAllResources($db);
+            getAllWeeks($db);
         }
     } elseif ($method === 'POST') {
         if ($action === 'comment') {
             createComment($db, $data);
         } else {
-            createResource($db, $data);
+            createWeek($db, $data);
         }
     } elseif ($method === 'PUT') {
-        updateResource($db, $data);
+        updateWeek($db, $data);
     } elseif ($method === 'DELETE') {
         if ($action === 'delete_comment') {
             deleteComment($db, $commentId);
         } else {
-            deleteResource($db, $id);
+            deleteWeek($db, $id);
         }
     } else {
-       
         sendResponse(['success' => false], 405);
     }
 } catch (Exception $e) {
-    sendResponse(['success' => false, 'message' => 'Server Error'], 500);
+    sendResponse(['success' => false, 'message' => $e->getMessage()], 500);
 }
 
 // --- FUNCTIONS ---
 
-function getAllResources($db) {
+function getAllWeeks($db) {
     $search = $_GET['search'] ?? '';
-    $query = "SELECT * FROM resources";
+    $query = "SELECT * FROM weeks";
     $params = [];
     if (!empty($search)) {
         $query .= " WHERE title LIKE :s OR description LIKE :s";
@@ -67,75 +63,86 @@ function getAllResources($db) {
     }
     $stmt = $db->prepare($query);
     $stmt->execute($params);
-    sendResponse(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
-}
-
-function getResourceById($db, $id) {
-    $stmt = $db->prepare("SELECT * FROM resources WHERE id = ?");
-    $stmt->execute([$id]);
-    $res = $stmt->fetch(PDO::FETCH_ASSOC);
+    $weeks = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    if (!$res) sendResponse(['success' => false], 404);
-    sendResponse(['success' => true, 'data' => $res]);
+    foreach ($weeks as &$row) {
+        $row['links'] = json_decode($row['links'], true) ?? [];
+    }
+
+    sendResponse(['success' => true, 'data' => $weeks ?: []]);
 }
 
-function createResource($db, $data) {
+function getWeekById($db, $id) {
+    $stmt = $db->prepare("SELECT * FROM weeks WHERE id = ?");
+    $stmt->execute([$id]);
+    $week = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$week) sendResponse(['success' => false], 404);
+    
+    $week['links'] = json_decode($week['links'], true) ?? [];
+    sendResponse(['success' => true, 'data' => $week]);
+}
+
+function createWeek($db, $data) {
     $title = trim($data['title'] ?? '');
-    $link = trim($data['link'] ?? '');
-  
-    if (empty($title) || empty($link) || !filter_var($link, FILTER_VALIDATE_URL)) {
+    $start_date = trim($data['start_date'] ?? '');
+    
+    if (empty($title) || empty($start_date)) {
         sendResponse(['success' => false], 400);
     }
-    $stmt = $db->prepare("INSERT INTO resources (title, link, description) VALUES (?, ?, ?)");
-    $stmt->execute([$title, $link, $data['description'] ?? '']);
-   
+    
+    $links = json_encode($data['links'] ?? []);
+    $stmt = $db->prepare("INSERT INTO weeks (title, start_date, description, links) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$title, $start_date, $data['description'] ?? '', $links]);
     sendResponse(['success' => true, 'id' => $db->lastInsertId()], 201);
 }
 
-function updateResource($db, $data) {
+function updateWeek($db, $data) {
     $id = $data['id'] ?? null;
-    $link = $data['link'] ?? '';
     if (!$id) sendResponse(['success' => false], 400);
 
-    if (!empty($link) && !filter_var($link, FILTER_VALIDATE_URL)) {
-        sendResponse(['success' => false], 400);
-    }
-    $stmt = $db->prepare("UPDATE resources SET title=?, link=?, description=? WHERE id=?");
-    $stmt->execute([$data['title'], $link, $data['description'], $id]);
-    if ($stmt->rowCount() === 0) sendResponse(['success' => false], 404); 
+  
+    $check = $db->prepare("SELECT id FROM weeks WHERE id = ?");
+    $check->execute([$id]);
+    if (!$check->fetch()) sendResponse(['success' => false], 404);
+
+    $links = json_encode($data['links'] ?? []);
+    $stmt = $db->prepare("UPDATE weeks SET title=?, start_date=?, description=?, links=? WHERE id=?");
+    $stmt->execute([$data['title'], $data['start_date'], $data['description'], $links, $id]);
     sendResponse(['success' => true]);
 }
 
-function deleteResource($db, $id) {
-    $stmt = $db->prepare("DELETE FROM resources WHERE id = ?");
+function deleteWeek($db, $id) {
+    $stmt = $db->prepare("DELETE FROM weeks WHERE id = ?");
     $stmt->execute([$id]);
-    if ($stmt->rowCount() === 0) sendResponse(['success' => false], 404); 
+    if ($stmt->rowCount() === 0) sendResponse(['success' => false], 404);
     sendResponse(['success' => true]);
 }
 
-function getComments($db, $resId) {
-    $stmt = $db->prepare("SELECT * FROM comments_resource WHERE resource_id = ?");
-    $stmt->execute([$resId]);
-    sendResponse(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+function getCommentsByWeek($db, $weekId) {
+    if (!$weekId) sendResponse(['success' => false], 400);
+    $stmt = $db->prepare("SELECT * FROM comments_week WHERE week_id = ?");
+    $stmt->execute([$weekId]);
+    sendResponse(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC) ?: []]);
 }
 
 function createComment($db, $data) {
-    $resId = $data['resource_id'] ?? null;
+    $weekId = $data['week_id'] ?? null;
     $text = trim($data['text'] ?? '');
-    if (!$resId || empty($text)) sendResponse(['success' => false], 400); 
     
+    if (!$weekId || empty($text)) sendResponse(['success' => false], 400);
+
     
-    $check = $db->prepare("SELECT id FROM resources WHERE id = ?");
-    $check->execute([$resId]);
+    $check = $db->prepare("SELECT id FROM weeks WHERE id = ?");
+    $check->execute([$weekId]);
     if (!$check->fetch()) sendResponse(['success' => false], 404);
 
-    $stmt = $db->prepare("INSERT INTO comments_resource (resource_id, author, text) VALUES (?, ?, ?)");
-    $stmt->execute([$resId, $data['author'] ?? 'Anonymous', $text]);
+    $stmt = $db->prepare("INSERT INTO comments_week (week_id, author, text) VALUES (?, ?, ?)");
+    $stmt->execute([$weekId, $data['author'] ?? 'Anonymous', $text]);
     sendResponse(['success' => true, 'id' => $db->lastInsertId()], 201);
 }
 
 function deleteComment($db, $id) {
-    $stmt = $db->prepare("DELETE FROM comments_resource WHERE id = ?");
+    $stmt = $db->prepare("DELETE FROM comments_week WHERE id = ?");
     $stmt->execute([$id]);
     if ($stmt->rowCount() === 0) sendResponse(['success' => false], 404);
     sendResponse(['success' => true]);
