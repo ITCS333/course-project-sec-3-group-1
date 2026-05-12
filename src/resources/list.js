@@ -56,7 +56,7 @@ async function loadResources() {
 
   try {
 
-    const response = await fetch("./api/index.php");
+    const response = await fetch("resources/api/index.php");
 
     const result = await response.json();
 

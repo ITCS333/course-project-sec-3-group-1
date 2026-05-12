@@ -77,12 +77,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 
 
-require_once __DIR__ . '/../../common/db.php';
-$db = getDBConnection();
+require_once './config/Database.php';
 
-if (!$db) {
-    echo json_encode(['success' => false, 'message' => 'Database connection failed']);
-    exit;}
+$database = new Database();
+$db = $database->getConnection();
 
 $method = $_SERVER['REQUEST_METHOD'];
 
