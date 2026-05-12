@@ -24,7 +24,7 @@ The website covers five functional areas, each assigned to one team member.
 | 1 | Home Page, Authentication & User Management | 202403090 | AliEbrahim202403090 |
 | 2 | Course Resources | 202306522 | abdulhakeem-11 |
 | 3 | Weekly Breakdown | 202203326 | Hasan427377 |
-| 4 | Assignments | | |
+| 4 | Assignments | 202010694 | AbdulAzizEbrahimSaleh |
 | 5 | Discussion Board | 20186990 | duaij29 |
 
 ---
