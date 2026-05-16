@@ -61,32 +61,27 @@ async function loadResources() {
 
     const result = await response.json();
 
-    // Clear existing content
     resourceListSection.innerHTML = '';
 
-    if (result.success && Array.isArray(result.data)) {
-
-      result.data.forEach(resource => {
-
-        const article = createResourceArticle(resource);
-
-        resourceListSection.appendChild(article);
-      });
-
-    } else {
-
-      resourceListSection.innerHTML = `
-        <p>Failed to load resources.</p>
-      `;
+    if (!result.success || !Array.isArray(result.data)) {
+      resourceListSection.innerHTML = '<p>No resources found.</p>';
+      return;
     }
+
+    result.data.forEach(resource => {
+
+      const article = createResourceArticle(resource);
+
+      resourceListSection.appendChild(article);
+
+    });
 
   } catch (error) {
 
-    console.error('Error loading resources:', error);
+    console.error(error);
 
-    resourceListSection.innerHTML = `
-      <p>An error occurred while loading resources.</p>
-    `;
+    resourceListSection.innerHTML =
+      '<p>Failed to load resources.</p>';
   }
 }
 

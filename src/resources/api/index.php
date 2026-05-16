@@ -75,8 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Include database connection
-require_once './config/Database.php';
-
+require_once __DIR__ . '/config/Database.php';
 // Get PDO connection
 $database = new Database();
 $db = $database->getConnection();
@@ -87,6 +86,9 @@ $method = $_SERVER['REQUEST_METHOD'];
 // Get request body
 $rawData = file_get_contents('php://input');
 $data = json_decode($rawData, true);
+if (!$data) {
+    $data = [];
+}
 
 // Parse query parameters
 $action = $_GET['action'] ?? null;
@@ -674,7 +676,7 @@ function validateUrl($url) {
 function sanitizeInput($data) {
 
     return htmlspecialchars(
-        strip_tags(trim($data)),
+        strip_tags(trim((string)$data)),
         ENT_QUOTES,
         'UTF-8'
     );
@@ -696,7 +698,8 @@ function validateRequiredFields($data, $requiredFields) {
 
         if (
             !isset($data[$field]) ||
-            trim($data[$field]) === ''
+            $data[$field] === '' ||
+            $data[$field] === null
         ) {
             $missing[] = $field;
         }
