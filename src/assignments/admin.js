@@ -60,8 +60,8 @@ async function handleAddAssignment(event) {
   event.preventDefault();
 
   const title = document.getElementById('assignment-title').value;
-  const description = document.getElementById('assignment-description').value;
   const due_date = document.getElementById('assignment-due-date').value;
+  const description = document.getElementById('assignment-description').value;
 
   const files = document
     .getElementById('assignment-files')
@@ -79,8 +79,8 @@ async function handleAddAssignment(event) {
   if (editId) {
     await handleUpdateAssignment(parseInt(editId), {
       title: title,
-      description: description,
       due_date: due_date,
+      description: description,
       files: files
     });
 
@@ -94,8 +94,8 @@ async function handleAddAssignment(event) {
     },
     body: JSON.stringify({
       title: title,
-      description: description,
       due_date: due_date,
+      description: description,
       files: files
     })
   });
@@ -106,8 +106,8 @@ async function handleAddAssignment(event) {
     assignments.push({
       id: result.id,
       title: title,
-      description: description,
       due_date: due_date,
+      description: description,
       files: files
     });
 
@@ -125,8 +125,8 @@ async function handleUpdateAssignment(id, fields) {
     body: JSON.stringify({
       id: id,
       title: fields.title,
-      description: fields.description,
       due_date: fields.due_date,
+      description: fields.description,
       files: fields.files
     })
   });
@@ -135,12 +135,12 @@ async function handleUpdateAssignment(id, fields) {
 
   if (result.success === true) {
     assignments = assignments.map(function (assignment) {
-      if (assignment.id === id) {
+      if (parseInt(assignment.id) === id) {
         return {
           id: id,
           title: fields.title,
-          description: fields.description,
           due_date: fields.due_date,
+          description: fields.description,
           files: fields.files
         };
       }
@@ -168,7 +168,7 @@ async function handleTableClick(event) {
 
     if (result.success === true) {
       assignments = assignments.filter(function (assignment) {
-        return assignment.id !== id;
+        return parseInt(assignment.id) !== id;
       });
 
       renderTable();
@@ -179,7 +179,7 @@ async function handleTableClick(event) {
     const id = parseInt(event.target.dataset.id);
 
     const assignment = assignments.find(function (assignment) {
-      return assignment.id === id;
+      return parseInt(assignment.id) === id;
     });
 
     if (!assignment) {
@@ -187,9 +187,14 @@ async function handleTableClick(event) {
     }
 
     document.getElementById('assignment-title').value = assignment.title;
-    document.getElementById('assignment-description').value = assignment.description;
     document.getElementById('assignment-due-date').value = assignment.due_date;
-    document.getElementById('assignment-files').value = assignment.files.join('\n');
+    document.getElementById('assignment-description').value = assignment.description;
+
+    if (Array.isArray(assignment.files)) {
+      document.getElementById('assignment-files').value = assignment.files.join('\n');
+    } else {
+      document.getElementById('assignment-files').value = '';
+    }
 
     submitButton.textContent = 'Update Assignment';
     submitButton.dataset.editId = assignment.id;
@@ -209,4 +214,5 @@ async function loadAndInitialize() {
   assignmentsTbody.addEventListener('click', handleTableClick);
 }
 
+// --- Initial Page Load ---
 loadAndInitialize();
