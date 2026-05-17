@@ -35,7 +35,6 @@ function renderAssignmentDetails(assignment) {
 
     link.href = url;
     link.textContent = url;
-    link.target = '_blank';
 
     listItem.appendChild(link);
     assignmentFilesList.appendChild(listItem);
@@ -104,15 +103,19 @@ async function initializePage() {
     return;
   }
 
-  const [assignmentResponse, commentsResponse] = await Promise.all([
-    fetch(`./api/index.php?id=${currentAssignmentId}`),
-    fetch(`./api/index.php?action=comments&assignment_id=${currentAssignmentId}`)
+  const responses = await Promise.all([
+    fetch('./api/index.php?id=' + currentAssignmentId),
+    fetch('./api/index.php?action=comments&assignment_id=' + currentAssignmentId)
   ]);
 
-  const assignmentResult = await assignmentResponse.json();
-  const commentsResult = await commentsResponse.json();
+  const assignmentResult = await responses[0].json();
+  const commentsResult = await responses[1].json();
 
-  currentComments = commentsResult.success === true ? commentsResult.data : [];
+  if (commentsResult.success === true) {
+    currentComments = commentsResult.data;
+  } else {
+    currentComments = [];
+  }
 
   if (assignmentResult.success === true && assignmentResult.data) {
     renderAssignmentDetails(assignmentResult.data);
@@ -123,5 +126,4 @@ async function initializePage() {
   }
 }
 
-// --- Initial Page Load ---
 initializePage();
