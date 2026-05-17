@@ -45,5 +45,5 @@ async function loadAssignments() {
   }
 }
 
-// --- Initial Page Load ---
 loadAssignments();
+
