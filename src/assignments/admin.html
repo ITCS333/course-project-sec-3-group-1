@@ -1,22 +1,42 @@
+<!--
+  Requirement: Create the Admin View for Assignments
+
+  Instructions:
+  Fill in the HTML elements as described in the comments.
+  This page allows the teacher (admin) to perform full CRUD operations
+  on course assignments.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+@@ -17,7 +10,7 @@
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Assignments</title>
     <link rel="stylesheet" href="style.css">
+
+    <!-- Required: link admin.js with defer. -->
+  
     <script src="admin.js" defer></script>
 </head>
 <body>
+@@ -27,10 +20,6 @@ <h1>Manage Assignments</h1>
 
     <header>
         <h1>Manage Assignments</h1>
     </header>
 
     <main>
+
+        <!-- ============================================================
+             Section 1: Add / Edit Assignment Form
+             ============================================================ -->
         <section>
             <h2>Add a New Assignment</h2>
 
+@@ -54,11 +43,6 @@ <h2>Add a New Assignment</h2>
             <form id="assignment-form" action="#">
                 <fieldset>
                     <legend>Assignment Details</legend>
@@ -38,9 +58,14 @@
             </form>
         </section>
 
+
+        <!-- ============================================================
+             Section 2: Existing Assignments Table
+             ============================================================ -->
         <section>
             <h2>Current Assignments</h2>
 
+@@ -73,7 +57,6 @@ <h2>Current Assignments</h2>
             <table id="assignments-table">
                 <thead>
                     <tr>
@@ -51,6 +76,9 @@
                     </tr>
                 </thead>
 
+                <tbody id="assignments-tbody">
+                    <!-- admin.js will inject rows here -->
+                </tbody>
                 <tbody id="assignments-tbody"></tbody>
             </table>
         </section>
