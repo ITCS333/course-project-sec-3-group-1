@@ -1,16 +1,9 @@
-/*
-  Requirement: Make the "Manage Assignments" page interactive.
-*/
-
-// --- Global Data Store ---
 let assignments = [];
 
-// --- Element Selections ---
 const assignmentForm = document.getElementById('assignment-form');
 const assignmentsTbody = document.getElementById('assignments-tbody');
 const submitButton = document.getElementById('add-assignment');
 
-// --- Functions ---
 
 function createAssignmentRow(assignment) {
   const row = document.createElement('tr');
