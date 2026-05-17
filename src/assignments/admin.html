@@ -1,66 +1,52 @@
+<!--
+  Requirement: Create the Admin View for Assignments
+
+  Instructions:
+  Fill in the HTML elements as described in the comments.
+  This page allows the teacher (admin) to perform full CRUD operations
+  on course assignments.
+-->
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Manage Assignments</title>
+@@ -17,7 +10,7 @@
 
     <link rel="stylesheet" href="style.css">
 
+    <!-- Required: link admin.js with defer. -->
   
     <script src="admin.js" defer></script>
 </head>
 <body>
-
-    <header>
-        <h1>Manage Assignments</h1>
+@@ -27,10 +20,6 @@ <h1>Manage Assignments</h1>
     </header>
 
     <main>
+
+        <!-- ============================================================
+             Section 1: Add / Edit Assignment Form
+             ============================================================ -->
         <section>
             <h2>Add a New Assignment</h2>
 
-            <form id="assignment-form" action="#">
-                <fieldset>
-                    <legend>Assignment Details</legend>
-
-                    <label for="assignment-title">Assignment Title</label>
-                    <input id="assignment-title" type="text" required>
-
-                    <label for="assignment-description">Description</label>
-                    <textarea id="assignment-description" rows="5" required></textarea>
-
-                    <label for="assignment-due-date">Due Date</label>
-                    <input id="assignment-due-date" type="date" required>
-
-                    <label for="assignment-files">Attached File URLs</label>
-                    <textarea id="assignment-files" rows="3" placeholder="Enter one URL per line"></textarea>
-
-                    <button id="add-assignment" type="submit">Add Assignment</button>
+@@ -54,11 +43,6 @@ <h2>Add a New Assignment</h2>
                 </fieldset>
             </form>
         </section>
+
+
+        <!-- ============================================================
+             Section 2: Existing Assignments Table
+             ============================================================ -->
         <section>
             <h2>Current Assignments</h2>
 
-            <table id="assignments-table">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Due Date</th>
-                        <th>Description</th>
-                        <th>Actions</th>
-                    </tr>
+@@ -73,7 +57,6 @@ <h2>Current Assignments</h2>
                 </thead>
 
                 <tbody id="assignments-tbody">
+                    <!-- admin.js will inject rows here -->
                 </tbody>
             </table>
         </section>
-
-    </main>
-</body>
-</html>
