@@ -1,9 +1,16 @@
+/*
+  Requirement: Make the "Manage Assignments" page interactive.
+*/
+
+// --- Global Data Store ---
 let assignments = [];
 
+// --- Element Selections ---
 const assignmentForm = document.getElementById('assignment-form');
 const assignmentsTbody = document.getElementById('assignments-tbody');
 const submitButton = document.getElementById('add-assignment');
 
+// --- Functions ---
 
 function createAssignmentRow(assignment) {
   const row = document.createElement('tr');
@@ -53,25 +60,30 @@ async function handleAddAssignment(event) {
   event.preventDefault();
 
   const title = document.getElementById('assignment-title').value;
-  const due_date = document.getElementById('assignment-due-date').value;
   const description = document.getElementById('assignment-description').value;
+  const due_date = document.getElementById('assignment-due-date').value;
 
   const files = document
     .getElementById('assignment-files')
     .value
     .split('\n')
-    .map(file => file.trim())
-    .filter(file => file !== '');
+    .map(function (file) {
+      return file.trim();
+    })
+    .filter(function (file) {
+      return file !== '';
+    });
 
   const editId = submitButton.dataset.editId;
 
   if (editId) {
     await handleUpdateAssignment(parseInt(editId), {
-      title,
-      due_date,
-      description,
-      files
+      title: title,
+      description: description,
+      due_date: due_date,
+      files: files
     });
+
     return;
   }
 
@@ -81,10 +93,10 @@ async function handleAddAssignment(event) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      title,
-      due_date,
-      description,
-      files
+      title: title,
+      description: description,
+      due_date: due_date,
+      files: files
     })
   });
 
@@ -93,10 +105,10 @@ async function handleAddAssignment(event) {
   if (result.success === true) {
     assignments.push({
       id: result.id,
-      title,
-      due_date,
-      description,
-      files
+      title: title,
+      description: description,
+      due_date: due_date,
+      files: files
     });
 
     renderTable();
@@ -111,10 +123,10 @@ async function handleUpdateAssignment(id, fields) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      id,
+      id: id,
       title: fields.title,
-      due_date: fields.due_date,
       description: fields.description,
+      due_date: fields.due_date,
       files: fields.files
     })
   });
@@ -125,10 +137,14 @@ async function handleUpdateAssignment(id, fields) {
     assignments = assignments.map(function (assignment) {
       if (assignment.id === id) {
         return {
-          ...assignment,
-          ...fields
+          id: id,
+          title: fields.title,
+          description: fields.description,
+          due_date: fields.due_date,
+          files: fields.files
         };
       }
+
       return assignment;
     });
 
@@ -144,7 +160,7 @@ async function handleTableClick(event) {
   if (event.target.classList.contains('delete-btn')) {
     const id = parseInt(event.target.dataset.id);
 
-    const response = await fetch(`./api/index.php?id=${id}`, {
+    const response = await fetch('./api/index.php?id=' + id, {
       method: 'DELETE'
     });
 
@@ -171,8 +187,8 @@ async function handleTableClick(event) {
     }
 
     document.getElementById('assignment-title').value = assignment.title;
-    document.getElementById('assignment-due-date').value = assignment.due_date;
     document.getElementById('assignment-description').value = assignment.description;
+    document.getElementById('assignment-due-date').value = assignment.due_date;
     document.getElementById('assignment-files').value = assignment.files.join('\n');
 
     submitButton.textContent = 'Update Assignment';
@@ -193,5 +209,4 @@ async function loadAndInitialize() {
   assignmentsTbody.addEventListener('click', handleTableClick);
 }
 
-// --- Initial Page Load ---
 loadAndInitialize();
