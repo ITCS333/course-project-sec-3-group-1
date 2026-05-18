@@ -29,7 +29,9 @@ function renderAssignmentDetails(assignment) {
 
   assignmentFilesList.innerHTML = '';
 
-  assignment.files.forEach(function (url) {
+  const files = Array.isArray(assignment.files) ? assignment.files : [];
+
+  files.forEach(function (url) {
     const listItem = document.createElement('li');
     const link = document.createElement('a');
 
@@ -103,13 +105,20 @@ async function initializePage() {
     return;
   }
 
-  const responses = await Promise.all([
-    fetch('./api/index.php?id=' + currentAssignmentId),
-    fetch('./api/index.php?action=comments&assignment_id=' + currentAssignmentId)
-  ]);
+  const assignmentResponse = await fetch('./api/index.php?id=' + currentAssignmentId);
+  const assignmentResult = await assignmentResponse.json();
 
-  const assignmentResult = await responses[0].json();
-  const commentsResult = await responses[1].json();
+  const commentsResponse = await fetch(
+    './api/index.php?action=comments&assignment_id=' + currentAssignmentId
+  );
+  const commentsResult = await commentsResponse.json();
+
+  if (assignmentResult.success === true && assignmentResult.data) {
+    renderAssignmentDetails(assignmentResult.data);
+  } else {
+    assignmentTitle.textContent = 'Assignment not found.';
+    return;
+  }
 
   if (commentsResult.success === true) {
     currentComments = commentsResult.data;
@@ -117,13 +126,10 @@ async function initializePage() {
     currentComments = [];
   }
 
-  if (assignmentResult.success === true && assignmentResult.data) {
-    renderAssignmentDetails(assignmentResult.data);
-    renderComments();
-    commentForm.addEventListener('submit', handleAddComment);
-  } else {
-    assignmentTitle.textContent = 'Assignment not found.';
-  }
+  renderComments();
+
+  commentForm.addEventListener('submit', handleAddComment);
 }
 
+// --- Initial Page Load ---
 initializePage();
