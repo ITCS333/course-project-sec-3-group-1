@@ -152,7 +152,7 @@ async function handleUpdateAssignment(id, fields) {
     assignmentForm.reset();
 
     submitButton.textContent = 'Add Assignment';
-    delete submitButton.dataset.editId;
+    submitButton.removeAttribute('data-edit-id');
   }
 }
 
